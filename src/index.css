@@ -1,0 +1,387 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+   /* background: #0b0b10; */
+}
+
+.Navbar-container {
+  height: 72px;
+  background: #0b0b10;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 40px;
+}
+
+/* Logo */
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+.title {
+  color: white;
+  font-size: 1.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Center Nav */
+.Nav-elements {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.Nav-elements ul {
+  display: flex;
+  gap: 50px;
+  list-style: none;
+}
+
+.Nav-elements li {
+  color: #9ca3af;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.Nav-elements li:hover {
+  color: white;
+}
+.Nav-elements a {
+    text-decoration: none;
+    color: #9ca3af;
+    transition: 0.3s;
+}
+
+.Nav-elements a:hover {
+    color: white;
+}
+/* Active Link Effect */
+.Nav-elements li::after {
+  content: "";
+  display: block;
+  width: 0;
+  height: 2px;
+  background: #8b5cf6;
+  transition: 0.3s;
+  margin-top: 5px;
+}
+
+.Nav-elements li:hover::after {
+  width: 100%;
+}
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+/* On-Chain Sync Button */
+.sync-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    background: rgba(17, 24, 39, 0.8);
+    border: 1px solid rgba(139, 92, 246, 0.25);
+
+    color: #d1d5db;
+    font-size: 14px;
+    font-weight: 500;
+
+    padding: 10px 18px;
+    border-radius: 14px;
+
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.sync-btn:hover {
+    border-color: #8b5cf6;
+    background: rgba(139, 92, 246, 0.08);
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Wallet Button */
+.wallet-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    background: rgba(17, 24, 39, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+
+    padding: 8px 16px;
+    border-radius: 14px;
+
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.wallet-btn:hover {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+}
+
+/* Wallet Avatar */
+.wallet-avatar {
+    width: 28px;
+    height: 28px;
+
+    border-radius: 50%;
+    background: linear-gradient(
+        135deg,
+        #8b5cf6,
+        #6366f1
+    );
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+}
+
+/* Header */
+.Header-container {
+    min-height: 85vh;
+    background: #08080d;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+    padding: 40px 20px;
+}
+
+/* Capsule */
+.capsule {
+    padding: 8px 18px;
+    border-radius: 999px;
+
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    background: rgba(17, 24, 39, 0.8);
+
+    color: #8b5cf6;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+
+    margin-bottom: 30px;
+}
+
+/* Main Heading */
+.Text-plain {
+    max-width: 950px;
+
+    color: white;
+    font-size: 5rem;
+    font-weight: 800;
+    line-height: 1.1;
+
+    margin-bottom: 30px;
+}
+
+.Text-plain span {
+    background: linear-gradient(
+        90deg,
+        #6366f1,
+        #8b5cf6,
+        #c084fc
+    );
+
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Description */
+.Description-text {
+    max-width: 850px;
+}
+.Body-container{
+    padding-top: 40px;
+    margin:10px;
+}
+
+.Description-text p {
+    color: #9ca3af;
+
+    font-size: 1.4rem;
+    line-height: 1.8;
+
+    margin-bottom: 50px;
+}
+
+/* Buttons Container */
+.Buttons-Header {
+    display: flex;
+    gap: 20px;
+}
+
+/* Launch App Button */
+.Buttons-Header button:first-child {
+    background: linear-gradient(
+        135deg,
+        #6366f1,
+        #8b5cf6
+    );
+
+    color: white;
+    border: none;
+
+    padding: 18px 32px;
+    border-radius: 18px;
+
+    font-size: 1rem;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.Buttons-Header button:first-child:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(139, 92, 246, 0.35);
+}
+
+/* Explore Button */
+.Buttons-Header button:last-child {
+    background: #111118;
+
+    color: white;
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    padding: 18px 32px;
+    border-radius: 18px;
+
+    font-size: 1rem;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.Buttons-Header button:last-child:hover {
+    border-color: #8b5cf6;
+    transform: translateY(-3px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .Text-plain {
+        font-size: 3rem;
+    }
+
+    .Description-text p {
+        font-size: 1rem;
+    }
+
+    .Buttons-Header {
+        flex-direction: column;
+        width: 100%;
+        max-width: 320px;
+    }
+
+    .Buttons-Header button {
+        width: 100%;
+    }
+}
+.State-cards{
+    display: flex;
+    justify-content: space-between;
+    
+}
+
+.card-container{
+    max-width: 25vw;
+    margin: 10px;
+    padding: 10px 20px;
+    display: flex;
+    color:aliceblue;
+    background-color: #0d0c0c;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    border: 2px slateblue;
+    border-radius: 20px;
+}
+.card-title{
+    font-size:1.5rem;
+    font-weight: bold;
+}
+
+.card-container div{
+    padding:10px;
+    text-align: center;
+    margin: 5px;
+}
+
+.second-header{
+    padding:100px;
+}
+.circle{
+    border-radius: 20px;
+    width:48px;
+    height:48px;
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 18px;
+
+}
+
+.Header-end{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width:100vw;
+    height:50vh;
+    background:rgba(139,92,246,0.08);
+    border:1.5px solid rgba(139,92,246, 0.4);
+    box-shadow:0 0 15px rgba(139,92,246,0.25);
+    border-radius: 30px;
+}
+.Footer-body{
+    height: 72px;
+  background: #0b0b10;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    color:aliceblue;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+}
+.footer-button button{
+    padding: 10px;
+    color:aliceblue;
+    background-color: #0b0b10;
+    border:none;
+
+}
