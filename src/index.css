@@ -385,3 +385,181 @@
     border:none;
 
 }
+
+
+.layout {
+    display: flex;
+}
+
+.main-content {
+    margin-left: 260px;
+    width: calc(100% - 260px);
+    min-height: 100vh;
+
+    padding: 40px;
+    color: aliceblue;
+    background: #08080d;
+}
+
+.project-page{
+    background:#0b0b10;
+    min-height:100vh;
+    padding:40px;
+    color:white;
+}
+
+.project-header{
+    max-width:900px;
+    margin:auto;
+    margin-bottom:35px;
+}
+
+.project-header h1{
+    font-size:2rem;
+    margin-bottom:10px;
+}
+
+.project-header p{
+    color:#9CA3AF;
+}
+
+.project-card{
+    max-width:900px;
+    margin:auto;
+
+    background:#1A1A1F;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:22px;
+
+    padding:30px;
+}
+
+.form-group{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:25px;
+}
+
+.form-group label{
+    color:#9CA3AF;
+    font-size:13px;
+    font-weight:600;
+    letter-spacing:1px;
+}
+
+.form-group span{
+    color:#7C5CFC;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea{
+    background:#0b0b10;
+    color:white;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:14px;
+
+    padding:16px;
+
+    outline:none;
+
+    font-size:15px;
+}
+
+.form-group textarea{
+    resize:none;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus{
+    border-color:#7C5CFC;
+}
+
+.row{
+    display:flex;
+    gap:25px;
+    margin-bottom:25px;
+}
+
+.flex-1{
+    flex:1;
+}
+
+.budget-row{
+    display:flex;
+    gap:10px;
+}
+
+.budget-row input{
+    flex:1;
+}
+
+.currency{
+    width:90px;
+}
+
+.info-box{
+    background:#232332;
+
+    border:1px solid rgba(124,92,252,.15);
+
+    color:#9CA3AF;
+
+    padding:18px;
+
+    border-radius:14px;
+
+    margin-bottom:30px;
+}
+
+.button-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    border-top:1px solid rgba(255,255,255,.08);
+
+    padding-top:25px;
+}
+
+.deploy-btn{
+    width:75%;
+
+    padding:16px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:linear-gradient(90deg,#6366f1,#7C5CFC);
+
+    color:white;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    cursor:pointer;
+}
+
+.cancel-btn{
+    width:20%;
+
+    padding:16px;
+
+    border-radius:14px;
+
+    background:transparent;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    color:#9CA3AF;
+
+    cursor:pointer;
+}

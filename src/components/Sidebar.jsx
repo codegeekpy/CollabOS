@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import "./Sidebar.css";
 
 function Sidebar() {
@@ -7,19 +7,20 @@ function Sidebar() {
             <h2 className="logo">CollabOS</h2>
 
             <nav>
-                <Link to="/"> Dashboard</Link>
-                <Link to="/projects"> Projects</Link>
-                <Link to="/verify"> Verify Work</Link>
-                <Link to="/escrows"> Escrows</Link>
-                <Link to="/payments"> Payments</Link>
-                <Link to="/settings"> Settings</Link>
+                <NavLink to="/"> Dashboard</NavLink>
+                <NavLink to="/ProjectList"> ProjectList</NavLink>
+                <NavLink to="/projects">Project</NavLink>
+                <NavLink to="/VerifyWork"> Verification Module</NavLink>
+                <NavLink to="/escrows"> Payment Escrows</NavLink>
+                <NavLink to="/BlockChainExplorer"> Blockchain Explorer</NavLink>
+                <NavLink to="/settings"> Settings</NavLink>
             </nav>
 
             <div className="profile">
                 <div className="avatar">K</div>
                 <div>
                     <h4>Kashi</h4>
-                    <p>Founder</p>
+                    <p></p>
                 </div>
             </div>
         </div>

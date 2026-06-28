@@ -8,6 +8,9 @@ import Dashboard from "./pages/Dashboard";
 import VerifyWork from "./pages/VerifyWork";
 import Escrows from "./pages/Escrows";
 import ProjectList from "./pages/ProjectList";
+import BlockChainExplorer from "./pages/BlockChainExplorer";
+import Settings from "./pages/Settings";
+import Layout from "./Layout";
 function Home(){
   return(<>
   <Navbar/>
@@ -21,12 +24,16 @@ function App(){
     <BrowserRouter>
     
      <Routes>
-      <Route path="/" element={<Home />}/>
+      <Route path="/" element={<Layout />}>
+        <Route index element={<Dashboard />} />
       <Route path="/projects" element={<Projects/>}/>
-      <Route path="/Dashboard" element={<Dashboard/>}/>
+      {/* <Route path="/Dashboard" element={<Dashboard/>}/> */}
        <Route path="/VerifyWork" element={<VerifyWork/>}/>
        <Route path="/Escrows" element={<Escrows/>}/>
        <Route path="/ProjectList" element={<ProjectList/>}/>
+       <Route path="/BlockChainExplorer" element={<BlockChainExplorer/>}/>
+       <Route path="/Settings" element={<Settings/>}/>
+       </Route>
      </Routes>
     </BrowserRouter>
   );

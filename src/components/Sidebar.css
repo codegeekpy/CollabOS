@@ -1,26 +1,36 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 .sidebar {
-    width: 260px;
-    height: 100vh;
-
-    background: #0b0b10;
-
-    border-right: 1px solid rgba(255,255,255,0.08);
-
     position: fixed;
     left: 0;
     top: 0;
 
+    width: 270px;
+    height: 100vh;
+
+    background: #09090f;
+    border-right: 1px solid rgba(255,255,255,.08);
+
     display: flex;
     flex-direction: column;
 
-    padding: 30px 20px;
+    padding: 30px 18px;
 }
+
+/* Logo */
 
 .logo {
     color: white;
     font-size: 2rem;
-    margin-bottom: 50px;
+    font-weight: 700;
+    margin-bottom: 40px;
 }
+
+/* Navigation */
 
 .sidebar nav {
     display: flex;
@@ -29,55 +39,72 @@
 }
 
 .sidebar nav a {
-    color: #9ca3af;
     text-decoration: none;
+    color: #9CA3AF;
 
     padding: 14px 18px;
     border-radius: 12px;
 
-    transition: 0.3s;
+    font-size: 16px;
+    font-weight: 500;
+
+    transition: .25s ease;
 }
 
 .sidebar nav a:hover {
-    background: rgba(139,92,246,0.15);
+    background: rgba(139,92,246,.15);
     color: white;
 }
+
+.sidebar nav a.active {
+    background: linear-gradient(
+        90deg,
+        rgba(99,102,241,.22),
+        rgba(139,92,246,.22)
+    );
+
+    color: white;
+}
+
+/* Push profile to bottom */
 
 .profile {
     margin-top: auto;
 
     display: flex;
     align-items: center;
-    gap: 12px;
 
-    padding: 15px;
-    border-radius: 12px;
+    gap: 14px;
 
-    background: rgba(255,255,255,0.04);
+    background: rgba(255,255,255,.05);
+
+    border-radius: 14px;
+
+    padding: 14px;
 }
 
 .avatar {
-    width: 45px;
-    height: 45px;
+    width: 46px;
+    height: 46px;
 
     border-radius: 50%;
 
     background: linear-gradient(135deg,#6366f1,#8b5cf6);
 
-    color: white;
-
     display: flex;
     justify-content: center;
     align-items: center;
 
-    font-weight: bold;
+    color: white;
+    font-weight: 700;
 }
 
 .profile h4 {
     color: white;
+    font-size: 17px;
 }
 
 .profile p {
-    color: gray;
+    color: #9CA3AF;
     font-size: 14px;
 }
