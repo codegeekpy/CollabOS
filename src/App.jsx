@@ -11,6 +11,7 @@ import ProjectList from "./pages/ProjectList";
 import BlockChainExplorer from "./pages/BlockChainExplorer";
 import Settings from "./pages/Settings";
 import Layout from "./Layout";
+import { useState } from "react";
 function Home(){
   return(<>
   <Navbar/>
@@ -20,17 +21,19 @@ function Home(){
 }
 
 function App(){
+  const [projects,setProjects] = useState([]);
   return(
     <BrowserRouter>
     
      <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Dashboard />} />
-      <Route path="/projects" element={<Projects/>}/>
+          <Route path="/" element={<Home />} />
+      <Route element={<Layout />}>
+        <Route path="/Dashboard" element={<Dashboard />} />
+      <Route path="/projects" element={<Projects projects={projects} setProjects={setProjects} />}/>
       {/* <Route path="/Dashboard" element={<Dashboard/>}/> */}
        <Route path="/VerifyWork" element={<VerifyWork/>}/>
        <Route path="/Escrows" element={<Escrows/>}/>
-       <Route path="/ProjectList" element={<ProjectList/>}/>
+       <Route path="/ProjectList" element={<ProjectList projects={projects}/>}/>
        <Route path="/BlockChainExplorer" element={<BlockChainExplorer/>}/>
        <Route path="/Settings" element={<Settings/>}/>
        </Route>

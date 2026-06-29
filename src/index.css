@@ -17,27 +17,34 @@
   padding: 0 40px;
 }
 
-/* Logo */
+
 
 .logo {
   display: flex;
   align-items: center;
+   /* outline:1px solid red; */
   gap: 10px;
+  height:100%;
 }
 
 .logo-img {
   width: 40px;
   height: 40px;
-  object-fit: contain;
+  display:block;
+    /* outline:1px solid blue; */
+    object-fit: contain;
 }
 .title {
   color: white;
-  font-size: 1.8rem;
-  font-weight: 700;
-  cursor: pointer;
+  display:flex;
+    align-items:center;
+    height:100%;
+    font-size:1.9rem;
+    font-weight:700;
+    line-height:1;
 }
 
-/* Center Nav */
+
 .Nav-elements {
   flex: 1;
   display: flex;
@@ -343,6 +350,9 @@
 
 .second-header{
     padding:100px;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
 }
 .circle{
     border-radius: 20px;
@@ -563,3 +573,40 @@
 
     cursor:pointer;
 }
+
+.Dashboard-page{
+    background:#0b0b10;
+    min-height:100vh;
+    padding:40px;
+    color:white;
+}
+
+.Dashboard-title{
+    display: flex;
+    justify-content:space-between;
+    align-items: flex-start;
+}
+.Dashboard-Node h3{
+    /* background-color:#232332; */
+    padding:8px;
+    font-family:  sans-serif;
+    border: 1px  white;
+    border-radius: 10px;
+}
+/*App.css */
+
+.blink {
+    animation: blink-animation 3s infinite;
+  }
+  
+  @keyframes blink-animation {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }

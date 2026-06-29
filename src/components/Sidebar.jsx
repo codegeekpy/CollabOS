@@ -4,10 +4,10 @@ import "./Sidebar.css";
 function Sidebar() {
     return (
         <div className="sidebar">
-            <h2 className="logo">CollabOS</h2>
+            <h2 className="logos">CollabOS</h2>
 
             <nav>
-                <NavLink to="/"> Dashboard</NavLink>
+                <NavLink to="/Dashboard"> Dashboard</NavLink>
                 <NavLink to="/ProjectList"> ProjectList</NavLink>
                 <NavLink to="/projects">Project</NavLink>
                 <NavLink to="/VerifyWork"> Verification Module</NavLink>
