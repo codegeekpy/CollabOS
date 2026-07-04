@@ -39,8 +39,8 @@ function Projects({projects,setProjects}) {
           locked vaults.
         </p>
       </div>
-
-      <div className="project-card">
+      {/* <hr/> */}
+      <div className="project-card" >
 
         {/* Startup Name */}
 
