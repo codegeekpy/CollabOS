@@ -1,6 +1,4 @@
-Got it — I found the project README, but **the specific “today’s learning doc” wasn’t uploaded as a separate file**.
 
-The notes we made today are in our conversation, so here is the document you were asking for:
 
 # CollabOS — Frontend Learning Notes
 
