@@ -1,18 +1,32 @@
 import Button from './components/ui/Button';
 import Badge from './components/ui/Badge';
+import Dashboard from './pages/Dashboard';
+import Projects from './pages/Projects';
+import Escrows from './pages/Escrows';
+import Settings from './pages/Settings';
+import Workspace from './pages/Workspace';
+import VerifyWork from "./pages/VerifyWork";
+import BlockchainExplorer from "./pages/BlockchainExplorer";
 import AppLayout from './components/layout/AppLayout';
-
-function App(){
-  return(
-  <AppLayout>
-    <h1 className="text-3xl font-bold">
-      Dashboard
-    </h1>
-    <p className="mt-2 text-slate-400">
-      Welcome to collabos
-    </p>
-    </AppLayout>
-
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/escrows" element={<Escrows />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/workspace" element={<Workspace />} />
+          <Route path="/verify-work" element={<VerifyWork />} />
+          <Route
+            path="/blockchain"
+            element={<BlockchainExplorer />}
+          />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 export default App;

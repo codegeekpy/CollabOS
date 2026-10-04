@@ -5,32 +5,42 @@ import {
   WalletCards,
   Settings
 } from "lucide-react";
+import { Blocks } from "lucide-react";
 
+import { NavLink } from "react-router-dom";
 function Sidebar() {
-    const navigation=[
-        {name:"Dashboard",icon:LayoutDashboard,
-             path:"/",
-        },
-        {
-            name:"Projects",
-            icon:FolderKanban,
-            path:"/projects",
-        },
-        {
-            name:"WorkSpace",
-            icon:BriefcaseBusiness,
-             path:"/workspace",
-        },{
-            name:"Escrows",
-            icon:WalletCards,
-             path:"/escrows",
-        },
-        {
-            name:"Settings",
-            icon:Settings,
-            path:"/settings"
-        }
-    ];
+  const navigation = [
+    {
+      name: "Dashboard", icon: LayoutDashboard,
+      path: "/",
+    },
+    {
+      name: "Projects",
+      icon: FolderKanban,
+      path: "/projects",
+    },
+    {
+      name: "WorkSpace",
+      icon: BriefcaseBusiness,
+      path: "/workspace",
+    }, {
+      name: "Escrows",
+      icon: WalletCards,
+      path: "/escrows",
+    },
+     {
+      name: "Blockchain",
+      icon: Blocks,
+      path: "/blockchain",
+    },
+    {
+      name: "Settings",
+      icon: Settings,
+      path: "/settings"
+    },
+   
+
+  ];
   return (
     <aside className="flex min-h-screen w-64 flex-col border-r border-slate-800 bg-slate-950 p-4">
       {/* Brand */}
@@ -40,14 +50,20 @@ function Sidebar() {
 
       {/* Navigation */}
       <nav className="mt-6 flex flex-col gap-2">
-        {navigation.map((item)=>(
-            <a
+        {navigation.map((item) => (
+          <NavLink
             key={item.name}
-            href={item.path}
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white">
-                <item.icon size={18}/>
-                {item.name}
-            </a>
+            to={item.path}
+            className={({ isActive }) =>
+              `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${isActive
+                ? "bg-slate-800 text-white"
+                : "text-slate-300 hover:bg-slate-800 hover:text-white"
+              }`
+            }
+          >
+            <item.icon size={18} />
+            {item.name}
+          </NavLink>
         ))}
       </nav>
     </aside>

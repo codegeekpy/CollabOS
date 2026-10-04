@@ -1,6 +1,7 @@
 import Sidebar from "./Sidebar";
-
-function AppLayout({children}){
+import { Outlet } from "react-router-dom";
+import Navbar from "./Navbar";
+function AppLayout(){
     return(
         <div className="flex min-h-screen bg-slate-950 text-white">
             <aside className="w-64 border-r border-slate-800">
@@ -8,10 +9,10 @@ function AppLayout({children}){
             </aside>
             <div className="flex flex-1 flex-col">
                 <header className="h-16 border-b border-slate-800">
-                    Navbar
+                    <Navbar/>
                 </header>
                 <main className="flex-1 p-6">
-                    {children}
+                    <Outlet/>
                 </main>
             </div>
         </div>
