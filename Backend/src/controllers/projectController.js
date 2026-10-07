@@ -2,11 +2,12 @@ import Project from "../models/Project.js";
 
 export const createProject = async(req,res)=>{
     try{
-        const {name,description,budget} = req.body;
+        const {name,description,budget,owner} = req.body;
         const project = await Project.create({
             name,
             description,
             budget,
+            owner,
         });
         res.status(201).json(project);
     }
@@ -75,3 +76,37 @@ export const updateProject = async (req,res)=>{
 };
 
 
+
+
+export const addContributor = async(req,res)=>{
+    try{
+        const {contributorId}= req.body;
+        const project = await Project.findByIdAndUpdate(
+            req.params.id,
+            {
+                $addToSet:{
+                    contributors: contributorId,
+
+                },
+            
+            },
+            {
+                new:true,
+                runValidators:true,
+            }
+        );
+        if (!project){
+            return res.status(404).json({
+                message:"Project not found",
+            });
+        }
+        res.status(200).json(project);
+
+    }
+    catch(error){
+        res.status(500).json({
+            message:"Failed to add contributor",
+            error: error.message,
+        });
+    }
+}

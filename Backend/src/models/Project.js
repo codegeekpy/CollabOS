@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 
 const projectSchema = new mongoose.Schema(
     {
@@ -22,6 +22,17 @@ const projectSchema = new mongoose.Schema(
             enum: ["draft", "active", "completed", "cancelled"],
             default: "draft",
         },
+        owner:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+        contributors:[
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ],
     },
     {
         timestamps: true,

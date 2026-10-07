@@ -5,6 +5,7 @@ import{
     getProjects,
     getProjectById,
     updateProject,
+    addContributor
 } from "../controllers/projectController.js";
 
 import { validateProject } from "../middleware/validateProject.js";
@@ -18,7 +19,7 @@ router.post("/", validateProject,
 router.get("/",getProjects);
 router.get("/:id",getProjectById);
 router.patch("/:id",updateProject);
-
+router.patch("/:id/contributors",addContributor);
 
 
 export default router;
