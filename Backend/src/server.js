@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import projectRoutes from "./routes/projectRoutes.js";
+import milestoneRoutes from "./routes/milestoneRoutes.js";
 
 dotenv.config()
 const app = express()
@@ -15,7 +16,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/projects",projectRoutes);
-
+app.use("/projects/:projectId/milestones",milestoneRoutes);
 
 app.listen(PORT,(req,res)=>{
     console.log("Server is running on Port");
