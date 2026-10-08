@@ -5,7 +5,11 @@ import {
   getMilestonesByProject,
   getSubmissionsByMilestone,
   updateSubmissionStatus,
+  getEscrows,
+  updateEscrow,
 } from "../lib/api";
+
+import { releaseOnChainEscrow } from "../lib/escrow";
 
 function VerifyWork() {
   const [submissions, setSubmissions] = useState([]);
@@ -56,30 +60,71 @@ function VerifyWork() {
     }
   };
 
-  const handleStatusChange = async (
-    submission,
-    status
-  ) => {
-    try {
-      setProcessingId(submission._id);
-      setError("");
+  const handleStatusChange = async (submission, status) => {
+  try {
+    setProcessingId(submission._id);
+    setError("");
 
+    // Reject does not involve blockchain
+    if (status === "rejected") {
       await updateSubmissionStatus(
         submission.milestone._id,
         submission._id,
-        status
+        "rejected"
       );
 
-      // Refresh submissions from backend
       await loadSubmissions();
-    } catch (error) {
-      console.error(error);
-      setError(error.message);
-    } finally {
-      setProcessingId(null);
+      return;
     }
-  };
 
+    // 1. Find escrow belonging to this milestone
+    const escrows = await getEscrows();
+
+    const escrow = escrows.find(
+      (item) =>
+        item.milestone?._id === submission.milestone._id
+    );
+
+    if (!escrow) {
+      throw new Error(
+        "No escrow found for this milestone."
+      );
+    }
+
+    if (escrow.status === "released") {
+      throw new Error(
+        "This escrow has already been released."
+      );
+    }
+
+    // 2. Approve submission in MongoDB
+    await updateSubmissionStatus(
+      submission.milestone._id,
+      submission._id,
+      "approved"
+    );
+
+    // 3. Ask MetaMask to release the escrow
+    const result = await releaseOnChainEscrow(
+      escrow.onChainEscrowId
+    );
+
+    // 4. Store blockchain transaction in MongoDB
+    await updateEscrow(escrow._id, {
+      status: "released",
+      releaseTxHash: result.hash,
+    });
+
+    // 5. Refresh UI
+    await loadSubmissions();
+
+  } catch (error) {
+    console.error(error);
+    setError(error.message);
+  } finally {
+    setProcessingId(null);
+  }
+};
   const statusVariants = {
     pending: "warning",
     approved: "success",
