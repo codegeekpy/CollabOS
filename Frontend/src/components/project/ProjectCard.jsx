@@ -1,6 +1,7 @@
 import Badge from "../ui/Badge";
 
-function ProjectCard({ project }) {
+
+function ProjectCard({ project, onClick }) {
   const statusVariants = {
     Active: "success",
     "In Progress": "warning",
@@ -8,7 +9,10 @@ function ProjectCard({ project }) {
   };
 
   return (
-    <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 transition hover:border-slate-700">
+   <div
+  onClick={onClick}
+  className="cursor-pointer rounded-xl border border-slate-800 bg-slate-900/50 p-5 transition hover:border-slate-700"
+>
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 className="text-lg font-semibold text-white">

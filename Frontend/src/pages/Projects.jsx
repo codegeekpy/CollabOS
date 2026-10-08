@@ -1,29 +1,30 @@
+
+
+import { useEffect, useState } from "react";
 import ProjectList from "../components/project/ProjectList";
+import { getProjects } from "../lib/api";
+import { useNavigate } from "react-router-dom";
 
 function Projects() {
-  const projects = [
-    {
-      id: 1,
-      name: "Website Redesign",
-      status: "Active",
-      budget: "$500",
-      description: "Redesign the company marketing website.",
-    },
-    {
-      id: 2,
-      name: "DeFi Dashboard",
-      status: "In Progress",
-      budget: "$1,200",
-      description: "Build analytics and portfolio tracking for DeFi users.",
-    },
-    {
-      id: 3,
-      name: "Mobile App",
-      status: "Completed",
-      budget: "$800",
-      description: "Cross-platform mobile application for the client.",
-    },
-  ];
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  useEffect(() => {
+    const loadProjects = async () => {
+      try {
+        const data = await getProjects();
+        setProjects(data);
+      } catch (error) {
+        console.error(error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProjects();
+  }, []);
 
   return (
     <div className="space-y-8">
@@ -56,8 +57,18 @@ function Projects() {
       </div>
 
       {/* Projects */}
-      {projects.length > 0 ? (
-        <ProjectList projects={projects} />
+      {loading ? (
+        <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-8 text-center text-slate-400" >
+          Loading projects...
+        </div>
+      ) : error ? (
+        <div className="rounded-xl border border-red-900 bg-red-950/30 p-8 text-center text-red-400">
+          {error}
+        </div>
+      ) : projects.length > 0 ? (
+        < ProjectList projects={projects}   onProjectClick={(project) =>
+navigate(`/workspace/${project._id}`)
+          } />
       ) : (
         <div className="rounded-xl border border-dashed border-slate-700 bg-slate-900/40 p-12 text-center">
           <h2 className="text-lg font-semibold text-white">
@@ -72,8 +83,9 @@ function Projects() {
             Create Project
           </button>
         </div>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 }
 

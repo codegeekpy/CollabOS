@@ -18,7 +18,7 @@ function App() {
           <Route path="/projects" element={<Projects />} />
           <Route path="/escrows" element={<Escrows />} />
           <Route path="/settings" element={<Settings />} />
-          <Route path="/workspace" element={<Workspace />} />
+         <Route path="/workspace/:projectId" element={<Workspace />} />
           <Route path="/verify-work" element={<VerifyWork />} />
           <Route
             path="/blockchain"

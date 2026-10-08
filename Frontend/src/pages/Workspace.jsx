@@ -1,4 +1,11 @@
+
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import Badge from "../components/ui/Badge";
+import { getProjectById } from "../lib/api";
+
+
+
 
 function Workspace() {
   const milestones = [
@@ -21,6 +28,28 @@ function Workspace() {
       amount: "$300",
     },
   ];
+  const { projectId } = useParams();
+
+  const [project, setProject] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    const loadProject = async () => {
+      try {
+        const data = await getProjectById(projectId);
+        setProject(data);
+      } catch (error) {
+        console.error(error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProject();
+  }, [projectId]);
+
+
 
   const statusVariants = {
     Completed: "success",
@@ -28,7 +57,34 @@ function Workspace() {
     Pending: "neutral",
   };
 
+  if (loading) {
+    return (
+      <div className="p-8 text-center text-slate-400">
+        Loading workspace...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-8 text-center text-red-400">
+        {error}
+      </div>
+    );
+  }
+
+  if (!project) {
+    return (
+      <div className="p-8 text-center text-slate-400">
+        Project not found.
+      </div>
+    );
+  }
+
+
   return (
+
+
     <div className="space-y-8">
       {/* Header */}
       <div>
@@ -37,7 +93,7 @@ function Workspace() {
         <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-white">
-              Website Redesign
+              {project?.name || "Project Workspace"}
             </h1>
 
             <p className="mt-2 text-slate-400">
@@ -45,7 +101,9 @@ function Workspace() {
             </p>
           </div>
 
-          <Badge variant="success">Active</Badge>
+          <Badge variant="success">
+            {project?.status || "Loading"}
+          </Badge>
         </div>
       </div>
 

@@ -15,6 +15,17 @@ const contract = new ethers.Contract(
 export const getOnChainEscrow = async (escrowId) => {
   return await contract.getEscrow(escrowId);
 };
+export const verifyEscrowFunding = async (escrowId) => {
+  const escrow = await contract.getEscrow(escrowId);
+
+  return {
+    client: escrow.client,
+    contributor: escrow.contributor,
+    amount: escrow.amount.toString(),
+    funded: escrow.funded,
+    released: escrow.released,
+  };
+};
 
 export const getContractBalance = async () => {
   return await provider.getBalance(contractAddress);

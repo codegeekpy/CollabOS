@@ -57,7 +57,7 @@ export const fundOnChainEscrow = async (
   const receipt = await tx.wait();
 
   return {
-    hash: receipt.hash,
+    hash: tx.hash,
     receipt,
   };
 };
@@ -70,7 +70,7 @@ export const releaseOnChainEscrow = async (escrowId) => {
   const receipt = await tx.wait();
 
   return {
-    hash: receipt.hash,
+    hash: tx.hash,
     receipt,
   };
 };
@@ -114,7 +114,7 @@ export const createOnChainEscrow = async (
   const receipt = await tx.wait();
 
   return {
-    hash: receipt.hash,
+    hash: tx.hash,
     receipt,
   };
 };

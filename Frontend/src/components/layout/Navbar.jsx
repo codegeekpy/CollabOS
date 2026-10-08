@@ -1,10 +1,10 @@
 import { useWallet } from "../../hooks/useWallet";
-// import {
-//     createOnChainEscrow,
-//     readOnChainEscrow,
-//     fundOnChainEscrow,
-//     releaseOnChainEscrow,
-// } from "../../lib/escrow";
+import {
+    createOnChainEscrow,
+    readOnChainEscrow,
+    fundOnChainEscrow,
+    releaseOnChainEscrow,
+} from "../../lib/escrow";
 
 
 function Navbar() {
@@ -29,6 +29,27 @@ function Navbar() {
             alert(error.message);
         }
     };
+    const testCreateEscrow = async () => {
+    try {
+        console.log("Releasing escrow #2...");
+        console.log(
+            "Expected contract:",
+            "0x645aB33263798dd2a0B11d399ad6dc2228f2CfA8"
+        );
+
+        const result = await releaseOnChainEscrow(2);
+
+        console.log("Release TX:", result.hash);
+
+        const escrow = await readOnChainEscrow(2);
+
+        console.log("Escrow #2 after release:", escrow);
+    } catch (error) {
+        console.error("Escrow release failed:", error);
+    }
+};
+
+
 
     // testing purpose
     // const testContract = async () => {
@@ -42,19 +63,31 @@ function Navbar() {
     // };
     // const testCreateEscrow = async () => {
     //     try {
-    //         const contributor =
-    //             "0x7F8Db27eb3215631A3a3E4CD14F948D6A8007336";
+    //         // const contributor =
+    //         //     "0x1134567890abcdef1234567890abcdef12345678";
 
-    //         const result = await createOnChainEscrow(
-    //             1,
-    //             contributor
-    //         );
+    //         // const result = await createOnChainEscrow(
+    //         //     2,
+    //         //     contributor
+    //         // );
 
-    //         console.log("Escrow created:", result.hash);
 
-    //         const escrow = await readOnChainEscrow(1);
+    //         const result = await releaseOnChainEscrow(2);
 
-    //         console.log("Escrow:", escrow);
+    //         console.log("Release TX:", result.hash);
+
+    //         // console.log("Escrow created:", result.hash);
+
+    //         // const escrow = await readOnChainEscrow(2);
+
+    //         // console.log("Escrow:", escrow);
+    //         // const result = await fundOnChainEscrow(2, "0.001");
+
+    //         // console.log("Funding TX:", result.hash);
+
+    //         //             const escrow = await readOnChainEscrow(2);
+    //         // console.log("Escrow #2:", escrow);
+
     //     } catch (error) {
     //         console.error("Escrow creation failed:", error);
     //     }
@@ -109,14 +142,14 @@ function Navbar() {
                 className="ml-2 rounded-lg border border-slate-700 px-4 py-2 text-sm text-white hover:bg-slate-800"
             >
                 Test Contract
-            </button>
+            </button>*
             <button
                 onClick={testCreateEscrow}
                 className="ml-2 rounded-lg border border-slate-700 px-4 py-2 text-sm text-white hover:bg-slate-800"
             >
                 Create Test Escrow
             </button>
-            <button
+             <button
                 onClick={testFundEscrow}
                 className="ml-2 rounded-lg border border-slate-700 px-4 py-2 text-sm text-white hover:bg-slate-800"
             >
