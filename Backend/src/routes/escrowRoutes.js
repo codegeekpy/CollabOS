@@ -6,17 +6,18 @@ import {
   verifyEscrowFunding
 } from "../services/blockchainService.js";
 import {
+  reserveEscrow,
   createEscrow,
   getEscrows,
   getEscrowById,
   updateEscrowStatus,
   syncEscrowWithBlockchain,
 } from "../controllers/escrowController.js";
-
 const router = express.Router();
 
 router.post("/", createEscrow);
 router.get("/", getEscrows);
+router.post("/reserve", reserveEscrow);
 router.get("/:id", getEscrowById);
 router.patch("/:id", updateEscrowStatus);
 router.patch("/:id/sync", syncEscrowWithBlockchain);

@@ -65,7 +65,7 @@ function VerifyWork() {
     setProcessingId(submission._id);
     setError("");
 
-    // Reject does not involve blockchain
+    // Rejection does not involve blockchain payout
     if (status === "rejected") {
       await updateSubmissionStatus(
         submission.milestone._id,
@@ -77,49 +77,44 @@ function VerifyWork() {
       return;
     }
 
-    // 1. Find escrow belonging to this milestone
+    // Get the escrow for this milestone
     const escrows = await getEscrows();
 
     const escrow = escrows.find(
-      (item) =>
-        item.milestone?._id === submission.milestone._id
+      (item) => item.milestone?._id === submission.milestone._id
     );
 
     if (!escrow) {
+      throw new Error("No escrow found for this milestone.");
+    }
+
+    if (escrow.status !== "funded") {
       throw new Error(
-        "No escrow found for this milestone."
+        `Escrow must be funded before approval. Current status: ${escrow.status}`
       );
     }
 
-    if (escrow.status === "released") {
-      throw new Error(
-        "This escrow has already been released."
-      );
-    }
+    // 1. Release payment on blockchain FIRST
+    const result = await releaseOnChainEscrow(
+      escrow.onChainEscrowId
+    );
 
-    // 2. Approve submission in MongoDB
+    // 2. Only after blockchain confirmation, update MongoDB
     await updateSubmissionStatus(
       submission.milestone._id,
       submission._id,
       "approved"
     );
 
-    // 3. Ask MetaMask to release the escrow
-    const result = await releaseOnChainEscrow(
-      escrow.onChainEscrowId
-    );
-
-    // 4. Store blockchain transaction in MongoDB
+    // 3. Mark escrow as released
     await updateEscrow(escrow._id, {
       status: "released",
       releaseTxHash: result.hash,
     });
 
-    // 5. Refresh UI
     await loadSubmissions();
-
   } catch (error) {
-    console.error(error);
+    console.error("Failed to update submission:", error);
     setError(error.message);
   } finally {
     setProcessingId(null);

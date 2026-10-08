@@ -44,15 +44,22 @@ export const getEscrowContract = async () => {
 //   };
 // };
 
-export const fundOnChainEscrow = async (
-  escrowId,
-  amountInEth
-) => {
+export const fundOnChainEscrow = async (escrowId) => {
   const contract = await getEscrowContract();
 
-  const tx = await contract.fundEscrow(escrowId, {
-    value: ethers.parseEther(amountInEth),
+  const value = ethers.parseEther("0.001");
+
+  console.log("Funding escrow:", {
+    escrowId,
+    value: value.toString(),
+    eth: ethers.formatEther(value),
   });
+
+  const tx = await contract.fundEscrow(escrowId, {
+    value,
+  });
+
+  console.log("Funding transaction:", tx.hash);
 
   const receipt = await tx.wait();
 

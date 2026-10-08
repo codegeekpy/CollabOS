@@ -137,3 +137,37 @@ export const createSubmission = async ({
 
   return response.json();
 };
+
+
+
+export const reserveEscrow = async ({
+  project,
+  milestone,
+  client,
+  contributor,
+  amount,
+}) => {
+  const response = await fetch("http://localhost:5000/escrows/reserve", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      project,
+      milestone,
+      client,
+      contributor,
+      amount,
+      token: "ETH",
+      chain: "sepolia",
+      contractAddress: "0x645aB33263798dd2a0B11d399ad6dc2228f2CfA8",
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "Failed to reserve escrow");
+  }
+
+  return response.json();
+};

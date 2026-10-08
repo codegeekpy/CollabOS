@@ -1,26 +1,56 @@
-
+import Project from "../models/Project.js";
 
 import Milestone from "../models/Milestone.js";
 
+export const createMilestone = async (req, res) => {
+  try {
+    const { title, description, amount } = req.body;
+    const { projectId } = req.params;
 
-export const createMilestone = async(req,res)=>{
-    try{
-            const {project,title,description,amount} = req.body;
-            
-            const milestone = await Milestone.create({
-                project,
-                title,
-                description,
-                amount
-            });
-            res.status(201).json(milestone)
+    if (!title || !description || amount === undefined) {
+      return res.status(400).json({
+        message: "title, description, and amount are required",
+      });
     }
-    catch(e){
-        res.status(500).json({
-            message:"Couldnt create milestone",
-            error:e.message,
-        });
+
+    if (Number(amount) <= 0) {
+      return res.status(400).json({
+        message: "Milestone amount must be greater than zero",
+      });
     }
+
+    const project = await Project.findById(projectId);
+
+    if (!project) {
+      return res.status(404).json({
+        message: "Project not found",
+      });
+    }
+
+    if (project.status === "completed" || project.status === "cancelled") {
+      return res.status(400).json({
+        message: "Cannot add milestones to this project",
+      });
+    }
+
+    const milestone = await Milestone.create({
+      project: project._id,
+      title: title.trim(),
+      description: description.trim(),
+      amount: Number(amount),
+      status: "pending",
+      submissionStatus: "not_submitted",
+    });
+
+    return res.status(201).json(milestone);
+  } catch (error) {
+    console.error("Failed to create milestone:", error);
+
+    return res.status(500).json({
+      message: "Failed to create milestone",
+      error: error.message,
+    });
+  }
 };
 
 export const getMilestone = async (req, res) => {

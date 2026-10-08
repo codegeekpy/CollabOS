@@ -5,7 +5,17 @@ import {
   getProjectById,
   getMilestonesByProject,
   getEscrows,
+  reserveEscrow,
+  updateEscrow,
 } from "../lib/api";
+
+import {
+  createOnChainEscrow,
+  fundOnChainEscrow,
+  readOnChainEscrow,
+  CONTRACT_ADDRESS,
+} from "../lib/escrow";
+
 
 function Workspace() {
   const { projectId } = useParams();
@@ -72,6 +82,61 @@ function Workspace() {
       (total, escrow) => total + Number(escrow.amount || 0),
       0
     );
+
+  const handleCreateEscrow = async (milestone) => {
+    try {
+      setError("");
+
+      // Prevent duplicate escrow for the same milestone
+      const existingEscrow = projectEscrows.find(
+        (escrow) => escrow.milestone?._id === milestone._id
+      );
+
+      if (existingEscrow) {
+        throw new Error("An escrow already exists for this milestone.");
+      }
+
+      // Get the assigned contributor
+      const contributor = project.contributors?.[0];
+
+      if (!contributor) {
+        throw new Error("No contributor assigned to this project.");
+      }
+
+      if (!contributor.walletAddress) {
+        throw new Error("Contributor does not have a wallet address.");
+      }
+
+      // 1. Reserve escrow ID in MongoDB
+      const escrow = await reserveEscrow({
+        project: project._id,
+        milestone: milestone._id,
+        client: project.owner?._id || project.owner,
+        contributor: contributor._id || contributor,
+        amount: milestone.amount,
+      });
+
+      // 2. Create escrow on blockchain
+      const result = await createOnChainEscrow(
+        escrow.onChainEscrowId,
+        contributor.walletAddress
+      );
+
+      // 3. Save blockchain information
+      await updateEscrow(escrow._id, {
+        contractAddress: CONTRACT_ADDRESS,
+      });
+
+      console.log("Escrow created on-chain:", result.hash);
+
+      // 4. Refresh escrow data
+      const updatedEscrows = await getEscrows();
+      setEscrows(updatedEscrows);
+    } catch (error) {
+      console.error("Failed to create escrow:", error);
+      setError(error.message);
+    }
+  };
 
   if (loading) {
     return (
@@ -212,7 +277,7 @@ function Workspace() {
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-4">
+                  <div className="flex flex-wrap items-center gap-3">
                     <Badge
                       variant={
                         statusVariants[milestone.status] ||
@@ -225,6 +290,84 @@ function Workspace() {
                     <span className="font-semibold text-white">
                       ${milestone.amount}
                     </span>
+
+                    {(() => {
+                      const escrow = projectEscrows.find(
+                        (item) => item.milestone?._id === milestone._id
+                      );
+
+                      if (!escrow) {
+                        return (
+                          <button
+                            onClick={() => handleCreateEscrow(milestone)}
+                            className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-500"
+                          >
+                            Create Escrow
+                          </button>
+                        );
+                      }
+
+                      if (escrow.status === "created") {
+                        return (
+                          <button
+                            onClick={async () => {
+                              try {
+                                setError("");
+
+                                const onChainEscrow = await readOnChainEscrow(
+                                  escrow.onChainEscrowId
+                                );
+
+                                console.log("ON-CHAIN ESCROW:", {
+                                  id: escrow.onChainEscrowId,
+                                  client: onChainEscrow.client,
+                                  contributor: onChainEscrow.contributor,
+                                  amount: onChainEscrow.amount.toString(),
+                                  funded: onChainEscrow.funded,
+                                  released: onChainEscrow.released,
+                                });
+
+                                const result = await fundOnChainEscrow(
+                                  escrow.onChainEscrowId
+                                );
+
+                                await updateEscrow(escrow._id, {
+                                  status: "funded",
+                                  fundingTxHash: result.hash,
+                                });
+
+                                const updatedEscrows = await getEscrows();
+                                setEscrows(updatedEscrows);
+                              } catch (error) {
+                                console.error("Failed to fund escrow:", error);
+                                setError(error.message);
+                              }
+                            }}
+                            className="rounded-lg bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-500"
+                          >
+                            Fund Escrow
+                          </button>
+                        );
+                      }
+
+                      if (escrow.status === "funded") {
+                        return (
+                          <Badge variant="warning">
+                            Funded
+                          </Badge>
+                        );
+                      }
+
+                      if (escrow.status === "released") {
+                        return (
+                          <Badge variant="success">
+                            Released
+                          </Badge>
+                        );
+                      }
+
+                      return null;
+                    })()}
                   </div>
                 </div>
               ))}
@@ -248,8 +391,8 @@ function Workspace() {
               <p className="mt-1 text-sm text-white">
                 {project.owner?.walletAddress
                   ? shortenAddress(
-                      project.owner.walletAddress
-                    )
+                    project.owner.walletAddress
+                  )
                   : project.owner?.name || "Unknown"}
               </p>
             </div>

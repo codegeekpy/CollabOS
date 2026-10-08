@@ -21,6 +21,9 @@ function SubmitWork() {
   useEffect(() => {
     const loadMilestones = async () => {
       try {
+        setLoading(true);
+        setError("");
+
         const data = await getMilestonesByProject(projectId);
 
         setMilestones(data);
@@ -29,7 +32,7 @@ function SubmitWork() {
           setMilestone(data[0]._id);
         }
       } catch (error) {
-        console.error(error);
+        console.error("Failed to load milestones:", error);
         setError(error.message);
       } finally {
         setLoading(false);
@@ -58,31 +61,23 @@ function SubmitWork() {
     try {
       setSubmitting(true);
 
-      /*
-       * Temporary contributor ID.
-       *
-       * This is the MongoDB contributor created during our
-       * blockchain demo. Later this will come from wallet
-       * authentication instead of being hardcoded.
-       */
-      const contributor =
-        "6ac67aac5383f7d1b26b76f8";
+      // Temporary contributor ID for the MVP.
+      // Later this will come from wallet authentication.
+      const contributorId = "6ac7bbe19104c89ef7b5b875";
 
       await createSubmission({
         milestone,
-        contributor,
-        description,
-        proofUrl,
+        contributor: contributorId,
+        description: description.trim(),
+        proofUrl: proofUrl.trim(),
       });
 
       setDescription("");
       setProofUrl("");
 
-      setSuccess(
-        "Work submitted successfully for review."
-      );
+      setSuccess("Work submitted successfully for review.");
     } catch (error) {
-      console.error(error);
+      console.error("Failed to submit work:", error);
       setError(error.message);
     } finally {
       setSubmitting(false);
@@ -128,9 +123,7 @@ function SubmitWork() {
 
           <select
             value={milestone}
-            onChange={(event) =>
-              setMilestone(event.target.value)
-            }
+            onChange={(event) => setMilestone(event.target.value)}
             className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-slate-500"
           >
             {milestones.map((item) => (
@@ -203,9 +196,7 @@ function SubmitWork() {
           disabled={submitting || milestones.length === 0}
           className="w-full rounded-lg bg-white px-4 py-3 text-sm font-semibold text-slate-950 hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {submitting
-            ? "Submitting..."
-            : "Submit Work"}
+          {submitting ? "Submitting..." : "Submit Work"}
         </button>
       </form>
     </div>

@@ -154,7 +154,7 @@ console.log("Funding TX:", result.hash);
                 className="ml-2 rounded-lg border border-slate-700 px-4 py-2 text-sm text-white hover:bg-slate-800"
             >
                 Test Contract
-            </button>*/}
+            </button>*
             <button
                 onClick={testCreateEscrow}
                 className="ml-2 rounded-lg border border-slate-700 px-4 py-2 text-sm text-white hover:bg-slate-800"
