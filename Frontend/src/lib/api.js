@@ -40,3 +40,14 @@ export const getProjectById = async (projectId) => {
 
   return response.json();
 };
+
+
+export const getEscrows = async () => {
+    const response = await fetch("http://localhost:5000/escrows");
+
+    if (!response.ok) {
+        throw new Error("Failed to fetch escrows");
+    }
+
+    return response.json();
+};

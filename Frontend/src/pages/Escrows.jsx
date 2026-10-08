@@ -1,144 +1,160 @@
-import Badge from "../components/ui/Badge";
+import { useEffect, useState } from "react";
+import { getEscrows } from "../lib/api";
 
 function Escrows() {
-  const escrows = [
-    {
-      id: "ESC-001",
-      project: "Website Redesign",
-      amount: "0.25 ETH",
-      status: "Funded",
-      network: "Sepolia",
-      created: "Oct 4, 2026",
-    },
-    {
-      id: "ESC-002",
-      project: "DeFi Dashboard",
-      amount: "0.60 ETH",
-      status: "Locked",
-      network: "Sepolia",
-      created: "Oct 3, 2026",
-    },
-    {
-      id: "ESC-003",
-      project: "Mobile App",
-      amount: "0.40 ETH",
-      status: "Released",
-      network: "Sepolia",
-      created: "Oct 1, 2026",
-    },
-  ];
+    const [escrows, setEscrows] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
-  const statusVariants = {
-    Funded: "success",
-    Locked: "warning",
-    Released: "info",
-    Disputed: "error",
-  };
+    useEffect(() => {
+        const loadEscrows = async () => {
+            try {
+                const data = await getEscrows();
+                setEscrows(data);
+            } catch (err) {
+                console.error(err);
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-  return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-white">Escrows</h1>
+        loadEscrows();
+    }, []);
 
-        <p className="mt-2 text-slate-400">
-          Track funds locked against your projects and milestones.
-        </p>
-      </div>
+    if (loading) {
+        return (
+            <div className="p-6 text-slate-400">
+                Loading escrows...
+            </div>
+        );
+    }
 
-      {/* Summary */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
-          <p className="text-sm text-slate-400">Total Locked</p>
-          <p className="mt-2 text-2xl font-bold text-white">
-            0.85 ETH
-          </p>
-        </div>
+    if (error) {
+        return (
+            <div className="p-6 text-red-400">
+                {error}
+            </div>
+        );
+    }
 
-        <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
-          <p className="text-sm text-slate-400">Active Escrows</p>
-          <p className="mt-2 text-2xl font-bold text-white">
-            2
-          </p>
-        </div>
+    return (
+        <div className="space-y-6 p-6">
+            <div>
+                <h1 className="text-2xl font-semibold text-white">
+                    Escrows
+                </h1>
+                <p className="mt-1 text-sm text-slate-400">
+                    Track blockchain-backed project payments.
+                </p>
+            </div>
 
-        <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
-          <p className="text-sm text-slate-400">Released</p>
-          <p className="mt-2 text-2xl font-bold text-white">
-            0.40 ETH
-          </p>
-        </div>
-      </div>
-
-      {/* Escrow list */}
-      <div>
-        <div className="mb-4">
-          <h2 className="text-xl font-semibold text-white">
-            Escrow Transactions
-          </h2>
-        </div>
-
-        <div className="overflow-hidden rounded-xl border border-slate-800">
-          <div className="hidden grid-cols-5 gap-4 border-b border-slate-800 bg-slate-900 px-5 py-3 text-xs font-medium uppercase tracking-wide text-slate-500 md:grid">
-            <span>Escrow</span>
-            <span>Project</span>
-            <span>Amount</span>
-            <span>Status</span>
-            <span>Network</span>
-          </div>
-
-          <div className="divide-y divide-slate-800">
-            {escrows.map((escrow) => (
-              <div
-                key={escrow.id}
-                className="grid grid-cols-1 gap-3 bg-slate-950/40 px-5 py-4 md:grid-cols-5 md:items-center md:gap-4"
-              >
-                <div>
-                  <p className="font-medium text-white">
-                    {escrow.id}
-                  </p>
-
-                  <p className="mt-1 text-xs text-slate-500">
-                    {escrow.created}
-                  </p>
+            {escrows.length === 0 ? (
+                <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-8 text-center">
+                    <p className="text-slate-400">
+                        No escrows found.
+                    </p>
                 </div>
+            ) : (
+                <div className="space-y-4">
+                    {escrows.map((escrow) => (
+                        <div
+                            key={escrow._id}
+                            className="rounded-xl border border-slate-800 bg-slate-900/40 p-5"
+                        >
+                            <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+                                <div>
+                                    <h2 className="font-medium text-white">
+                                        Escrow #{escrow.onChainEscrowId}
+                                    </h2>
 
-                <p className="text-sm text-slate-300">
-                  {escrow.project}
-                </p>
+                                    <p className="mt-1 text-sm text-slate-400">
+                                        {escrow.project?.name || "Unknown project"}
+                                    </p>
+                                </div>
 
-                <p className="font-semibold text-white">
-                  {escrow.amount}
-                </p>
+                                <span className="w-fit rounded-full border border-slate-700 px-3 py-1 text-xs capitalize text-slate-300">
+                                    {escrow.status}
+                                </span>
+                            </div>
 
-                <div>
-                  <Badge variant={statusVariants[escrow.status]}>
-                    {escrow.status}
-                  </Badge>
+                            <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                                <div>
+                                    <p className="text-xs text-slate-500">
+                                        Amount
+                                    </p>
+                                    <p className="mt-1 text-sm text-white">
+                                        {escrow.amount} {escrow.token}
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <p className="text-xs text-slate-500">
+                                        Chain
+                                    </p>
+                                    <p className="mt-1 text-sm text-white capitalize">
+                                        {escrow.chain}
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <p className="text-xs text-slate-500">
+                                        Client
+                                    </p>
+                                    <p className="mt-1 text-sm text-white">
+                                        {escrow.client?.name || "Unknown"}
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <p className="text-xs text-slate-500">
+                                        Contributor
+                                    </p>
+                                    <p className="mt-1 text-sm text-white">
+                                        {escrow.contributor?.name || "Unknown"}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="mt-5 space-y-2 border-t border-slate-800 pt-4">
+                                {escrow.fundingTxHash && (
+                                    <div className="text-sm">
+                                        <span className="text-slate-500">
+                                            Funding TX:{" "}
+                                        </span>
+                                        <a
+                                            href={`https://sepolia.etherscan.io/tx/${escrow.fundingTxHash}`}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="break-all text-blue-400 hover:text-blue-300"
+                                        >
+                                            {escrow.fundingTxHash}
+                                        </a>
+                                    </div>
+                                )}
+
+                                {escrow.releaseTxHash && (
+                                    <div className="text-sm">
+                                        <span className="text-slate-500">
+                                            Release TX:{" "}
+                                        </span>
+                                        <a
+                                            href={`https://sepolia.etherscan.io/tx/${escrow.releaseTxHash}`}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="break-all text-blue-400 hover:text-blue-300"
+                                        >
+                                            {escrow.releaseTxHash}
+                                        </a>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    ))}
                 </div>
-
-                <p className="text-sm text-slate-400">
-                  {escrow.network}
-                </p>
-              </div>
-            ))}
-          </div>
+            )}
         </div>
-      </div>
-
-      {/* Empty-state/action placeholder */}
-      <div className="rounded-xl border border-dashed border-slate-700 bg-slate-900/30 p-6">
-        <h3 className="font-semibold text-white">
-          Smart Escrow
-        </h3>
-
-        <p className="mt-2 text-sm text-slate-400">
-          Funds will be deposited into the escrow smart contract
-          when wallet integration is connected.
-        </p>
-      </div>
-    </div>
-  );
+    );
 }
 
 export default Escrows;
