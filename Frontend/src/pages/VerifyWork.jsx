@@ -1,32 +1,118 @@
+import { useEffect, useState } from "react";
 import Badge from "../components/ui/Badge";
+import {
+  getProjects,
+  getMilestonesByProject,
+  getSubmissionsByMilestone,
+  updateSubmissionStatus,
+} from "../lib/api";
 
 function VerifyWork() {
-  const submissions = [
-    {
-      id: 1,
-      project: "Website Redesign",
-      milestone: "Frontend Development",
-      contributor: "0x39...F21B",
-      amount: "0.15 ETH",
-      status: "Pending Review",
-      submitted: "2 hours ago",
-    },
-    {
-      id: 2,
-      project: "DeFi Dashboard",
-      milestone: "Analytics Dashboard",
-      contributor: "0x82...91AC",
-      amount: "0.30 ETH",
-      status: "Approved",
-      submitted: "1 day ago",
-    },
-  ];
+  const [submissions, setSubmissions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [processingId, setProcessingId] = useState(null);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    loadSubmissions();
+  }, []);
+
+  const loadSubmissions = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const projects = await getProjects();
+
+      const allSubmissions = [];
+
+      for (const project of projects) {
+        const milestones = await getMilestonesByProject(
+          project._id
+        );
+
+        for (const milestone of milestones) {
+          const milestoneSubmissions =
+            await getSubmissionsByMilestone(
+              milestone._id
+            );
+
+          milestoneSubmissions.forEach((submission) => {
+            allSubmissions.push({
+              ...submission,
+              project,
+              milestone,
+            });
+          });
+        }
+      }
+
+      setSubmissions(allSubmissions);
+    } catch (error) {
+      console.error(error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStatusChange = async (
+    submission,
+    status
+  ) => {
+    try {
+      setProcessingId(submission._id);
+      setError("");
+
+      await updateSubmissionStatus(
+        submission.milestone._id,
+        submission._id,
+        status
+      );
+
+      // Refresh submissions from backend
+      await loadSubmissions();
+    } catch (error) {
+      console.error(error);
+      setError(error.message);
+    } finally {
+      setProcessingId(null);
+    }
+  };
 
   const statusVariants = {
-    "Pending Review": "warning",
-    Approved: "success",
-    Rejected: "error",
+    pending: "warning",
+    approved: "success",
+    rejected: "error",
   };
+
+  const formatStatus = (status) => {
+    return status
+      .replace("_", " ")
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+
+  const shortenAddress = (address) => {
+    if (!address) return "Unknown";
+
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
+  const pendingCount = submissions.filter(
+    (submission) => submission.status === "pending"
+  ).length;
+
+  const approvedCount = submissions.filter(
+    (submission) => submission.status === "approved"
+  ).length;
+
+  if (loading) {
+    return (
+      <div className="p-8 text-center text-slate-400">
+        Loading submissions...
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -37,9 +123,17 @@ function VerifyWork() {
         </h1>
 
         <p className="mt-2 text-slate-400">
-          Review milestone submissions before releasing escrow funds.
+          Review milestone submissions before releasing
+          escrow funds.
         </p>
       </div>
+
+      {/* Error */}
+      {error && (
+        <div className="rounded-lg border border-red-900/50 bg-red-950/30 p-4 text-sm text-red-400">
+          {error}
+        </div>
+      )}
 
       {/* Summary */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -49,7 +143,7 @@ function VerifyWork() {
           </p>
 
           <p className="mt-2 text-2xl font-bold text-white">
-            1
+            {pendingCount}
           </p>
         </div>
 
@@ -59,17 +153,17 @@ function VerifyWork() {
           </p>
 
           <p className="mt-2 text-2xl font-bold text-white">
-            1
+            {approvedCount}
           </p>
         </div>
 
         <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
           <p className="text-sm text-slate-400">
-            Awaiting Payout
+            Total Submissions
           </p>
 
           <p className="mt-2 text-2xl font-bold text-white">
-            0.15 ETH
+            {submissions.length}
           </p>
         </div>
       </div>
@@ -80,69 +174,132 @@ function VerifyWork() {
           Milestone Submissions
         </h2>
 
-        <div className="mt-4 space-y-4">
-          {submissions.map((submission) => (
-            <div
-              key={submission.id}
-              className="rounded-xl border border-slate-800 bg-slate-900/50 p-5"
-            >
-              <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-                <div>
-                  <div className="flex flex-wrap items-center gap-3">
-                    <h3 className="font-semibold text-white">
-                      {submission.milestone}
-                    </h3>
+        {submissions.length === 0 ? (
+          <div className="mt-4 rounded-xl border border-slate-800 bg-slate-900/50 p-8 text-center">
+            <p className="text-slate-400">
+              No submissions found.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-4 space-y-4">
+            {submissions.map((submission) => {
+              const isProcessing =
+                processingId === submission._id;
 
-                    <Badge
-                      variant={statusVariants[submission.status]}
-                    >
-                      {submission.status}
-                    </Badge>
+              return (
+                <div
+                  key={submission._id}
+                  className="rounded-xl border border-slate-800 bg-slate-900/50 p-5"
+                >
+                  <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <h3 className="font-semibold text-white">
+                          {submission.milestone?.title}
+                        </h3>
+
+                        <Badge
+                          variant={
+                            statusVariants[
+                              submission.status
+                            ] || "neutral"
+                          }
+                        >
+                          {formatStatus(
+                            submission.status
+                          )}
+                        </Badge>
+                      </div>
+
+                      <p className="mt-2 text-sm text-slate-400">
+                        {submission.project?.name}
+                      </p>
+
+                      <div className="mt-3 flex flex-wrap gap-4 text-xs text-slate-500">
+                        <span>
+                          Contributor:{" "}
+                          {submission.contributor
+                            ?.walletAddress
+                            ? shortenAddress(
+                                submission.contributor
+                                  .walletAddress
+                              )
+                            : "Unknown"}
+                        </span>
+
+                        <span>
+                          Submitted:{" "}
+                          {new Date(
+                            submission.createdAt
+                          ).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                      <span className="font-semibold text-white">
+                        {submission.milestone?.amount} ETH
+                      </span>
+
+                      {submission.status ===
+                        "pending" && (
+                        <>
+                          <button
+                            onClick={() =>
+                              handleStatusChange(
+                                submission,
+                                "rejected"
+                              )
+                            }
+                            disabled={isProcessing}
+                            className="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            {isProcessing
+                              ? "Processing..."
+                              : "Reject"}
+                          </button>
+
+                          <button
+                            onClick={() =>
+                              handleStatusChange(
+                                submission,
+                                "approved"
+                              )
+                            }
+                            disabled={isProcessing}
+                            className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            {isProcessing
+                              ? "Processing..."
+                              : "Approve"}
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
 
-                  <p className="mt-2 text-sm text-slate-400">
-                    {submission.project}
-                  </p>
+                  {/* Description */}
+                  <div className="mt-5 border-t border-slate-800 pt-4">
+                    <p className="text-sm text-slate-300">
+                      {submission.description}
+                    </p>
 
-                  <div className="mt-3 flex flex-wrap gap-4 text-xs text-slate-500">
-                    <span>
-                      Contributor: {submission.contributor}
-                    </span>
-
-                    <span>
-                      Submitted: {submission.submitted}
-                    </span>
+                    {submission.proofUrl && (
+                      <a
+                        href={submission.proofUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-3 inline-block text-sm text-blue-400 hover:text-blue-300"
+                      >
+                        View proof →
+                      </a>
+                    )}
                   </div>
                 </div>
-
-                <div className="flex items-center gap-4">
-                  <span className="font-semibold text-white">
-                    {submission.amount}
-                  </span>
-
-                  {submission.status === "Pending Review" && (
-                    <>
-                      <button className="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800">
-                        Reject
-                      </button>
-
-                      <button className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-slate-200">
-                        Approve
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              <div className="mt-5 border-t border-slate-800 pt-4">
-                <p className="text-sm text-slate-400">
-                  Submission details, GitHub PR, proof of work,
-                  and verification data will appear here.
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

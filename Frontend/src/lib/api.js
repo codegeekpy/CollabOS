@@ -64,3 +64,76 @@ export const getMilestonesByProject = async (projectId) => {
 
   return response.json();
 };
+
+export const getSubmissionsByMilestone = async (milestoneId) => {
+  const response = await fetch(
+    `http://localhost:5000/milestones/${milestoneId}/submissions`
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch submissions");
+  }
+
+  return response.json();
+};
+
+export const updateSubmissionStatus = async (
+  milestoneId,
+  submissionId,
+  status
+) => {
+  const response = await fetch(
+    `http://localhost:5000/milestones/${milestoneId}/submissions/${submissionId}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status }),
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.json();
+
+    throw new Error(
+      error.message || "Failed to update submission"
+    );
+  }
+
+  return response.json();
+};
+
+
+export const createSubmission = async ({
+  milestone,
+  contributor,
+  description,
+  proofUrl,
+}) => {
+  const response = await fetch(
+    `http://localhost:5000/milestones/${milestone}/submissions`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        milestone,
+        contributor,
+        description,
+        proofUrl,
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.json();
+
+    throw new Error(
+      error.message || "Failed to create submission"
+    );
+  }
+
+  return response.json();
+};
