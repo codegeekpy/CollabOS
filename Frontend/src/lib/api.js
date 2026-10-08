@@ -51,3 +51,16 @@ export const getEscrows = async () => {
 
     return response.json();
 };
+
+
+export const getMilestonesByProject = async (projectId) => {
+  const response = await fetch(
+    `http://localhost:5000/projects/${projectId}/milestones`
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch milestones");
+  }
+
+  return response.json();
+};
