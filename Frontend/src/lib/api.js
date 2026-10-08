@@ -171,3 +171,38 @@ export const reserveEscrow = async ({
 
   return response.json();
 };
+
+
+
+
+export const createMilestone = async ({
+  projectId,
+  title,
+  description,
+  amount,
+}) => {
+  const response = await fetch(
+    `http://localhost:5000/projects/${projectId}/milestones`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title,
+        description,
+        amount,
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.json();
+
+    throw new Error(
+      error.message || "Failed to create milestone"
+    );
+  }
+
+  return response.json();
+};

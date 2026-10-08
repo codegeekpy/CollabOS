@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Badge from "../components/ui/Badge";
 import {
   getProjectById,
@@ -7,8 +7,8 @@ import {
   getEscrows,
   reserveEscrow,
   updateEscrow,
+  createMilestone,
 } from "../lib/api";
-
 import {
   createOnChainEscrow,
   fundOnChainEscrow,
@@ -25,6 +25,18 @@ function Workspace() {
   const [milestones, setMilestones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const [showMilestoneModal, setShowMilestoneModal] =
+    useState(false);
+
+  const [milestoneTitle, setMilestoneTitle] = useState("");
+  const [milestoneDescription, setMilestoneDescription] =
+    useState("");
+  const [milestoneAmount, setMilestoneAmount] =
+    useState("");
+
+  const [creatingMilestone, setCreatingMilestone] =
+    useState(false);
 
   useEffect(() => {
     const loadWorkspace = async () => {
@@ -82,6 +94,63 @@ function Workspace() {
       (total, escrow) => total + Number(escrow.amount || 0),
       0
     );
+
+  const handleCreateMilestone = async (event) => {
+    event.preventDefault();
+
+    try {
+      setError("");
+
+      if (!milestoneTitle.trim()) {
+        throw new Error("Milestone title is required.");
+      }
+
+      if (!milestoneDescription.trim()) {
+        throw new Error(
+          "Milestone description is required."
+        );
+      }
+
+      if (
+        !milestoneAmount ||
+        Number(milestoneAmount) <= 0
+      ) {
+        throw new Error(
+          "Milestone amount must be greater than zero."
+        );
+      }
+
+      setCreatingMilestone(true);
+
+      const newMilestone = await createMilestone({
+        projectId,
+        title: milestoneTitle.trim(),
+        description: milestoneDescription.trim(),
+        amount: Number(milestoneAmount),
+      });
+
+      setMilestones((current) => [
+        ...current,
+        newMilestone,
+      ]);
+
+      // Reset form
+      setMilestoneTitle("");
+      setMilestoneDescription("");
+      setMilestoneAmount("");
+
+      setShowMilestoneModal(false);
+    } catch (error) {
+      console.error(
+        "Failed to create milestone:",
+        error
+      );
+
+      setError(error.message);
+    } finally {
+      setCreatingMilestone(false);
+    }
+  };
 
   const handleCreateEscrow = async (milestone) => {
     try {
@@ -244,7 +313,14 @@ function Workspace() {
               </p>
             </div>
 
-            <button className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-white hover:bg-slate-800">
+            <button
+              type="button"
+              onClick={() => {
+                setError("");
+                setShowMilestoneModal(true);
+              }}
+              className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-white transition hover:bg-slate-800"
+            >
               + Add Milestone
             </button>
           </div>
@@ -350,13 +426,32 @@ function Workspace() {
                         );
                       }
 
-                      if (escrow.status === "funded") {
-                        return (
-                          <Badge variant="warning">
-                            Funded
-                          </Badge>
-                        );
-                      }
+                     if (escrow.status === "funded") {
+  if (milestone.submissionStatus === "submitted") {
+    return (
+      <Badge variant="warning">
+        Submitted
+      </Badge>
+    );
+  }
+
+  if (milestone.submissionStatus === "approved") {
+    return (
+      <Badge variant="success">
+        Approved
+      </Badge>
+    );
+  }
+
+  return (
+    <Link
+      to={`/projects/${projectId}/submit/${milestone._id}`}
+      className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-500"
+    >
+      Submit Work
+    </Link>
+  );
+}
 
                       if (escrow.status === "released") {
                         return (
@@ -548,7 +643,7 @@ function Workspace() {
         )}
       </div>
 
-      {/* Activity */}
+            {/* Activity */}
       <div>
         <h2 className="text-xl font-semibold text-white">
           Recent Activity
@@ -561,8 +656,134 @@ function Workspace() {
           </p>
         </div>
       </div>
+
+      {/* Add Milestone Modal */}
+      {showMilestoneModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-lg rounded-xl border border-slate-800 bg-slate-950 p-6 shadow-2xl">
+
+            {/* Modal Header */}
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-white">
+                  Add Milestone
+                </h2>
+
+                <p className="mt-1 text-sm text-slate-400">
+                  Define a deliverable and its budget.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowMilestoneModal(false)}
+                className="text-2xl text-slate-500 hover:text-white"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Form */}
+            <form
+              onSubmit={handleCreateMilestone}
+              className="mt-6 space-y-5"
+            >
+              {/* Title */}
+              <div>
+                <label className="text-sm font-medium text-slate-300">
+                  Milestone Title
+                </label>
+
+                <input
+                  type="text"
+                  value={milestoneTitle}
+                  onChange={(event) =>
+                    setMilestoneTitle(event.target.value)
+                  }
+                  placeholder="e.g. Build authentication system"
+                  className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-slate-500"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="text-sm font-medium text-slate-300">
+                  Description
+                </label>
+
+                <textarea
+                  value={milestoneDescription}
+                  onChange={(event) =>
+                    setMilestoneDescription(event.target.value)
+                  }
+                  placeholder="Describe what needs to be completed..."
+                  rows={5}
+                  className="mt-2 w-full resize-none rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-slate-500"
+                />
+              </div>
+
+              {/* Amount */}
+              <div>
+                <label className="text-sm font-medium text-slate-300">
+                  Milestone Budget
+                </label>
+
+                <div className="mt-2 flex">
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={milestoneAmount}
+                    onChange={(event) =>
+                      setMilestoneAmount(event.target.value)
+                    }
+                    placeholder="500"
+                    className="w-full rounded-l-lg border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-slate-500"
+                  />
+
+                  <span className="flex items-center rounded-r-lg border border-l-0 border-slate-700 bg-slate-800 px-4 text-sm text-slate-400">
+                    USD
+                  </span>
+                </div>
+
+                <p className="mt-2 text-xs text-slate-500">
+                  This is the milestone project budget.
+                </p>
+              </div>
+
+              {/* Error */}
+              {error && (
+                <div className="rounded-lg border border-red-900/50 bg-red-950/30 p-3 text-sm text-red-400">
+                  {error}
+                </div>
+              )}
+
+              {/* Buttons */}
+              <div className="flex justify-end gap-3 border-t border-slate-800 pt-5">
+                <button
+                  type="button"
+                  onClick={() => setShowMilestoneModal(false)}
+                  className="rounded-lg border border-slate-700 px-4 py-2.5 text-sm font-medium text-slate-300 hover:bg-slate-800"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={creatingMilestone}
+                  className="rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-slate-950 hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {creatingMilestone
+                    ? "Creating..."
+                    : "Create Milestone"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
-
 export default Workspace;

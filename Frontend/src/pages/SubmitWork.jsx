@@ -6,7 +6,7 @@ import {
 } from "../lib/api";
 
 function SubmitWork() {
-  const { projectId } = useParams();
+  const { projectId, milestoneId } = useParams();
 
   const [milestones, setMilestones] = useState([]);
   const [milestone, setMilestone] = useState("");
@@ -17,7 +17,6 @@ function SubmitWork() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
   useEffect(() => {
     const loadMilestones = async () => {
       try {
@@ -28,9 +27,19 @@ function SubmitWork() {
 
         setMilestones(data);
 
-        if (data.length > 0) {
-          setMilestone(data[0]._id);
+        if (data.length === 0) {
+          throw new Error("No milestones found.");
         }
+
+        const selectedMilestone = data.find(
+          (item) => item._id === milestoneId
+        );
+
+        if (!selectedMilestone) {
+          throw new Error("Milestone not found.");
+        }
+
+        setMilestone(selectedMilestone._id);
       } catch (error) {
         console.error("Failed to load milestones:", error);
         setError(error.message);
@@ -40,7 +49,7 @@ function SubmitWork() {
     };
 
     loadMilestones();
-  }, [projectId]);
+  }, [projectId, milestoneId]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -123,17 +132,16 @@ function SubmitWork() {
 
           <select
             value={milestone}
-            onChange={(event) => setMilestone(event.target.value)}
-            className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-slate-500"
+            disabled
+            className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white opacity-80 outline-none"
           >
-            {milestones.map((item) => (
-              <option
-                key={item._id}
-                value={item._id}
-              >
-                {item.title} — {item.amount} ETH
-              </option>
-            ))}
+            {milestones
+              .filter((item) => item._id === milestoneId)
+              .map((item) => (
+                <option key={item._id} value={item._id}>
+                  {item.title} — ${item.amount}
+                </option>
+              ))}
           </select>
         </div>
 
